@@ -40,4 +40,10 @@ public class ConsentResource implements IConsentResource {
 		log.info("Consultando todos os consentimentos");
 		return ResponseEntity.ok().body(consentService.getAll());
 	}
+
+	@Override
+	public ResponseEntity<ConsentResponse> findByConsentId(String id) {
+		log.info("Buscando consentimento: {}", id);
+		return ResponseEntity.ok().body(consentService.getConsentById(id));
+	}
 }

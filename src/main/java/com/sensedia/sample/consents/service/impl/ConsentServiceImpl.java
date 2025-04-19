@@ -7,6 +7,7 @@ import com.sensedia.sample.consents.dto.response.ConsentResponse;
 import com.sensedia.sample.consents.mapper.ConsentMapper;
 import com.sensedia.sample.consents.repository.ConsentRepository;
 import com.sensedia.sample.consents.service.IConsentService;
+import com.sensedia.sample.consents.service.exceptions.ConsentNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -38,7 +39,9 @@ public class ConsentServiceImpl implements IConsentService {
 
     @Override
     public ConsentResponse getConsentById(String id) {
-        return null;
+        Consent consent = consentRepository.findById(id)
+                .orElseThrow(() -> new ConsentNotFoundException("Consent not found"));
+        return consentMapper.toResponse(consent);
     }
 
     @Override
