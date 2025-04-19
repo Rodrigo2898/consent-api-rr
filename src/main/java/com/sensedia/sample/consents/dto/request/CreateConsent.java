@@ -7,8 +7,8 @@ import org.hibernate.validator.constraints.br.CPF;
 
 import java.time.LocalDateTime;
 
-public record ConsentRequest(@NotBlank @CPF String cpf,
-                             ConsentStatus status,
-                             LocalDateTime expirationDateTime,
-                             @Size(min = 1, max = 50) String additionalInfo) {
+public record CreateConsent(@NotBlank @CPF String cpf,
+                            ConsentStatus status,
+                            LocalDateTime expirationDateTime,
+                            @Size(min = 1, max = 50) String additionalInfo) {
 }

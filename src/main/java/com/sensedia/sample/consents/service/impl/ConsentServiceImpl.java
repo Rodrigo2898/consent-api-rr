@@ -2,12 +2,11 @@ package com.sensedia.sample.consents.service.impl;
 
 import com.sensedia.sample.consents.domain.document.Consent;
 import com.sensedia.sample.consents.domain.enums.ConsentStatus;
-import com.sensedia.sample.consents.dto.request.ConsentRequest;
+import com.sensedia.sample.consents.dto.request.CreateConsent;
 import com.sensedia.sample.consents.dto.response.ConsentResponse;
 import com.sensedia.sample.consents.mapper.ConsentMapper;
 import com.sensedia.sample.consents.repository.ConsentRepository;
 import com.sensedia.sample.consents.service.IConsentService;
-import com.sensedia.sample.consents.service.exceptions.ConsentNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -26,9 +25,9 @@ public class ConsentServiceImpl implements IConsentService {
     }
 
     @Override
-    public void saveConsent(ConsentRequest request) {
+    public void saveConsent(CreateConsent request) {
         Consent consent = consentMapper.toDocument(request);
-        consent.setStatus(ConsentStatus.ACTIVE);
+//        consent.setStatus(ConsentStatus.ACTIVE);
         consent.setCreationDateTime(LocalDateTime.now());
         consentRepository.save(consent);
     }
@@ -39,17 +38,19 @@ public class ConsentServiceImpl implements IConsentService {
     }
 
     @Override
-    public ConsentResponse getConsentById(UUID id) {
+    public ConsentResponse getConsentById(String id) {
         return null;
     }
 
     @Override
-    public ConsentResponse updateConsent(UUID id, ConsentRequest request) {
+    public ConsentResponse updateConsent(String id, CreateConsent request) {
         return null;
     }
 
     @Override
-    public void deleteConsent(UUID id) {
+    public void deleteConsent(String id) {
 
     }
+
+
 }

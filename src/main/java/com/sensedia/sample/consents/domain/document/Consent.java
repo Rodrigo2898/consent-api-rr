@@ -12,7 +12,6 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Document(collection = "consent")
 @Data
@@ -22,7 +21,7 @@ import java.util.UUID;
 public class Consent {
 
     @Id
-    private UUID id;
+    private String id;
     @CPF(message = "CPF inválido")
     @NotBlank
     private String cpf;

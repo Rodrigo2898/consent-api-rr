@@ -2,7 +2,7 @@ package com.sensedia.sample.consents.mapper;
 
 import com.sensedia.sample.consents.domain.document.Consent;
 import com.sensedia.sample.consents.dto.ConsentDTO;
-import com.sensedia.sample.consents.dto.request.ConsentRequest;
+import com.sensedia.sample.consents.dto.request.CreateConsent;
 import com.sensedia.sample.consents.dto.response.ConsentResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -16,7 +16,7 @@ public interface ConsentMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "creationDateTime", ignore = true)
-    Consent toDocument(ConsentRequest dto);
+    Consent toDocument(CreateConsent dto);
 
     ConsentResponse toResponse(Consent document);
 

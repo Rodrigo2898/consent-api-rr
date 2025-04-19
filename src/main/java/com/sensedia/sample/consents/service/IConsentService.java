@@ -1,20 +1,19 @@
 package com.sensedia.sample.consents.service;
 
-import com.sensedia.sample.consents.dto.request.ConsentRequest;
+import com.sensedia.sample.consents.dto.request.CreateConsent;
 import com.sensedia.sample.consents.dto.response.ConsentResponse;
 
 import java.util.List;
-import java.util.UUID;
 
 public interface IConsentService {
 
-    void saveConsent(ConsentRequest request);
+    void saveConsent(CreateConsent request);
 
     List<ConsentResponse> getAll();
 
-    ConsentResponse getConsentById(UUID id);
+    ConsentResponse getConsentById(String id);
 
-    ConsentResponse updateConsent(UUID id, ConsentRequest request);
+    ConsentResponse updateConsent(String id, CreateConsent request);
 
-    void deleteConsent(UUID id);
+    void deleteConsent(String id);
 }
