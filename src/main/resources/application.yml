@@ -5,4 +5,5 @@ spring:
     name: consents
   data:
     mongodb:
-      uri: mongodb://usuario:senha@servidor:27017/SEU_BANCO
+      uri: mongodb://consent:consent@localhost:27017/consentdb?authSource=admin
+
