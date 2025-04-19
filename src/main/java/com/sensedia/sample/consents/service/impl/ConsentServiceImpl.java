@@ -3,6 +3,7 @@ package com.sensedia.sample.consents.service.impl;
 import com.sensedia.sample.consents.domain.document.Consent;
 import com.sensedia.sample.consents.domain.enums.ConsentStatus;
 import com.sensedia.sample.consents.dto.request.CreateConsent;
+import com.sensedia.sample.consents.dto.request.UpdateConsent;
 import com.sensedia.sample.consents.dto.response.ConsentResponse;
 import com.sensedia.sample.consents.mapper.ConsentMapper;
 import com.sensedia.sample.consents.repository.ConsentRepository;
@@ -26,8 +27,8 @@ public class ConsentServiceImpl implements IConsentService {
     }
 
     @Override
-    public void saveConsent(CreateConsent request) {
-        Consent consent = consentMapper.toDocument(request);
+    public void saveConsent(CreateConsent dto) {
+        Consent consent = consentMapper.toDocument(dto);
         consent.setCreationDateTime(LocalDateTime.now());
         consentRepository.save(consent);
     }
@@ -45,9 +46,17 @@ public class ConsentServiceImpl implements IConsentService {
     }
 
     @Override
-    public ConsentResponse updateConsent(String id, CreateConsent request) {
-        return null;
+    public ConsentResponse updateConsent(String id, UpdateConsent dto) {
+        Consent consent = consentRepository.findById(id)
+                .orElseThrow(() -> new ConsentNotFoundException("Consent not found"));
+
+        consent.setStatus(dto.status());
+        consent.setExpirationDateTime(dto.expirationDateTime());
+        consent.setAdditionalInfo(dto.additionalInfo());
+
+        return consentMapper.toResponse(consentRepository.save(consent));
     }
+
 
     @Override
     public void deleteConsent(String id) {
