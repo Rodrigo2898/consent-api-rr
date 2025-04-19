@@ -1,7 +1,6 @@
 package com.sensedia.sample.consents.service.impl;
 
 import com.sensedia.sample.consents.domain.document.Consent;
-import com.sensedia.sample.consents.domain.enums.ConsentStatus;
 import com.sensedia.sample.consents.dto.request.CreateConsent;
 import com.sensedia.sample.consents.dto.request.UpdateConsent;
 import com.sensedia.sample.consents.dto.response.ConsentResponse;
@@ -13,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 public class ConsentServiceImpl implements IConsentService {
@@ -41,14 +39,14 @@ public class ConsentServiceImpl implements IConsentService {
     @Override
     public ConsentResponse getConsentById(String id) {
         Consent consent = consentRepository.findById(id)
-                .orElseThrow(() -> new ConsentNotFoundException("Consent not found"));
+                .orElseThrow(() -> new ConsentNotFoundException("Consentimento não encontrado"));
         return consentMapper.toResponse(consent);
     }
 
     @Override
     public ConsentResponse updateConsent(String id, UpdateConsent dto) {
         Consent consent = consentRepository.findById(id)
-                .orElseThrow(() -> new ConsentNotFoundException("Consent not found"));
+                .orElseThrow(() -> new ConsentNotFoundException("Consentimento não encontrado"));
 
         consent.setStatus(dto.status());
         consent.setExpirationDateTime(dto.expirationDateTime());
@@ -57,11 +55,10 @@ public class ConsentServiceImpl implements IConsentService {
         return consentMapper.toResponse(consentRepository.save(consent));
     }
 
-
     @Override
     public void deleteConsent(String id) {
-
+        Consent consent = consentRepository.findById(id)
+                .orElseThrow(() -> new ConsentNotFoundException("Consentimento não encontrado"));
+        consentRepository.delete(consent);
     }
-
-
 }

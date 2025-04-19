@@ -23,4 +23,7 @@ public interface IConsentResource {
 
 	@PutMapping(value = "/{id}")
 	ResponseEntity<ConsentResponse> update(@PathVariable String id, @Valid @RequestBody UpdateConsent consent);
+
+	@DeleteMapping(value = "/{id}")
+	ResponseEntity<Void> delete(@PathVariable String id);
 }

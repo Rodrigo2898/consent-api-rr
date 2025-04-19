@@ -48,4 +48,11 @@ public class ConsentResource implements IConsentResource {
 		log.info("Consentimento {} foi atualizado", id);
 		return ResponseEntity.ok().body(consentService.updateConsent(id, consent));
 	}
+
+	@Override
+	public ResponseEntity<Void> delete(String id) {
+		log.info("Deletando consentimento: {}", id);
+		consentService.deleteConsent(id);
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+	}
 }
