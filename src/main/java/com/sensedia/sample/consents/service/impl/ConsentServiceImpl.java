@@ -27,14 +27,13 @@ public class ConsentServiceImpl implements IConsentService {
     @Override
     public void saveConsent(CreateConsent request) {
         Consent consent = consentMapper.toDocument(request);
-//        consent.setStatus(ConsentStatus.ACTIVE);
         consent.setCreationDateTime(LocalDateTime.now());
         consentRepository.save(consent);
     }
 
     @Override
     public List<ConsentResponse> getAll() {
-        return List.of();
+        return consentMapper.toResponseList(consentRepository.findAll());
     }
 
     @Override
