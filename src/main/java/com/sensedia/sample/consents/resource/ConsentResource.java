@@ -1,4 +1,4 @@
-package com.sensedia.sample.consents.rest;
+package com.sensedia.sample.consents.resource;
 
 import org.springframework.http.ResponseEntity;
 
@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Slf4j
-public class ConsentApi implements IConsentApi {
+public class ConsentResource implements IConsentResource {
 
 	@Override
 	public ResponseEntity<Object> findAll() {

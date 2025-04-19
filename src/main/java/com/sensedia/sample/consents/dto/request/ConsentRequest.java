@@ -9,5 +9,6 @@ import java.time.LocalDateTime;
 
 public record ConsentRequest(@NotBlank @CPF String cpf,
                              ConsentStatus status,
-                             @Size(min = 1, max = 50) LocalDateTime expirationDateTime) {
+                             LocalDateTime expirationDateTime,
+                             @Size(min = 1, max = 50) String additionalInfo) {
 }
