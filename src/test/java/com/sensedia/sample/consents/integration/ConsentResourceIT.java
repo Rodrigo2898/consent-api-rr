@@ -148,6 +148,36 @@ public class ConsentResourceIT {
                 .body("additionalInfo", Matchers.equalTo("Consentimento revogado"));
     }
 
+    @Test
+    void shouldDeleteConsentSuccessfully() {
+        String requestBody = """
+            {
+              "cpf": "899.732.810-71",
+              "status": "ACTIVE",
+              "expirationDateTime": "2025-12-31T23:59:59",
+              "additionalInfo": "Consentimento para uso de dados pessoais"
+            }
+            """;
+
+        var id = RestAssured.given()
+                .contentType(ContentType.JSON)
+                .body(requestBody)
+                .when()
+                .post("/consents")
+                .then()
+                .statusCode(201)
+                .extract()
+                .path("id");
+
+        RestAssured.given()
+                .contentType(ContentType.JSON)
+                .when()
+                .delete("/consents/" + id)
+                .then()
+                .statusCode(204);
+
+    }
+
 
     private void createTestConsent(String cpf, String status) {
         String json = String.format("""
