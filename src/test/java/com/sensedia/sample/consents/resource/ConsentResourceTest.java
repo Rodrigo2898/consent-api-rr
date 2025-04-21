@@ -1,6 +1,8 @@
 package com.sensedia.sample.consents.resource;
 
+import com.sensedia.sample.consents.domain.enums.ConsentStatus;
 import com.sensedia.sample.consents.dto.request.CreateConsent;
+import com.sensedia.sample.consents.dto.request.UpdateConsent;
 import com.sensedia.sample.consents.factory.ConsentFactory;
 import com.sensedia.sample.consents.service.IConsentService;
 import org.junit.jupiter.api.Nested;
@@ -13,10 +15,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatusCode;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -31,7 +35,7 @@ class ConsentResourceTest {
 
     @Captor
     ArgumentCaptor<CreateConsent> createConsentArgumentCaptor;
-
+    
     @Captor
     ArgumentCaptor<String> consentIdArgumentCaptor;
 
@@ -171,4 +175,65 @@ class ConsentResourceTest {
         }
     }
 
+    @Nested
+    class UpdateConsentResource {
+
+        @Test
+        void shouldReturnHttpOk() {
+            // Arrange
+            var id = UUID.randomUUID().toString();
+            var in = new UpdateConsent(ConsentStatus.REVOKED, LocalDateTime.now(), "Atualizado");
+            var out = ConsentFactory.buildConsentResponse();
+
+            when(consentService.updateConsent(id, in)).thenReturn(out);
+
+            // Act
+            var response = consentResource.update(id, in);
+
+            // Assert
+            assertEquals(HttpStatusCode.valueOf(200), response.getStatusCode());
+        }
+
+
+        @Test
+        void shouldPassCorrectParametersToConsentService() {
+            // Arrange
+            var id = UUID.randomUUID().toString();
+            var in = new UpdateConsent(ConsentStatus.REVOKED, LocalDateTime.now(), "Atualizado");
+            var out = ConsentFactory.buildConsentResponse();
+
+            when(consentService.updateConsent(id, in)).thenReturn(out);
+
+            // Act
+            var response = consentResource.update(id, in);
+
+            // Assert
+            verify(consentService).updateConsent(eq(id), eq(in));
+        }
+
+        @Test
+        void shouldReturnUpdatedConsentResponseCorrectly() {
+            // Arrange
+            var id = UUID.randomUUID().toString();
+            var dto = new UpdateConsent(ConsentStatus.REVOKED, LocalDateTime.now(), "Atualizado");
+            var expected = ConsentFactory.buildConsentResponse();
+
+            when(consentService.updateConsent(id, dto)).thenReturn(expected);
+
+            // Act
+            var result = consentResource.update(id, dto);
+
+            // Assert
+            assertNotNull(result);
+            assertNotNull(result.getBody());
+
+            var body = result.getBody();
+            assertEquals(expected.id(), body.id());
+            assertEquals(expected.cpf(), body.cpf());
+            assertEquals(expected.status(), body.status());
+            assertEquals(expected.creationDateTime(), body.creationDateTime());
+            assertEquals(expected.expirationDateTime(), body.expirationDateTime());
+            assertEquals(expected.additionalInfo(), body.additionalInfo());
+        }
+    }
 }
