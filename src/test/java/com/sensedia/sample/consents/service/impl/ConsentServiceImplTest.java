@@ -1,6 +1,8 @@
 package com.sensedia.sample.consents.service.impl;
 
 import com.sensedia.sample.consents.domain.document.Consent;
+import com.sensedia.sample.consents.domain.enums.ConsentStatus;
+import com.sensedia.sample.consents.dto.request.UpdateConsent;
 import com.sensedia.sample.consents.factory.ConsentFactory;
 import com.sensedia.sample.consents.mapper.ConsentMapper;
 import com.sensedia.sample.consents.repository.ConsentRepository;
@@ -196,5 +198,112 @@ class ConsentServiceImplTest {
             verify(consentRepository).findById(id);
             verifyNoMoreInteractions(consentMapper);
         }
+    }
+
+    @Nested
+    class Update {
+
+        @Test
+        void shouldCallRepositoryUpdateConsent() {
+            // Arrange
+            var id = UUID.randomUUID().toString();
+            var existingConsent = ConsentFactory.buildConsent(ConsentFactory.buildCreateConsent());
+            existingConsent.setId(id);
+
+            var dto = new UpdateConsent(
+                    ConsentStatus.REVOKED,
+                    LocalDateTime.parse("2025-12-01T00:00:00"),
+                    "Atualização de consentimento"
+            );
+
+            var updatedConsent = Consent.builder()
+                    .id(id)
+                    .cpf(existingConsent.getCpf())
+                    .status(dto.status())
+                    .expirationDateTime(dto.expirationDateTime())
+                    .additionalInfo(dto.additionalInfo())
+                    .creationDateTime(existingConsent.getCreationDateTime())
+                    .build();
+
+            var expectedResponse = ConsentFactory.buildConsentResponse();
+
+            when(consentRepository.findById(id)).thenReturn(Optional.of(existingConsent));
+            when(consentRepository.save(any(Consent.class))).thenReturn(updatedConsent);
+            when(consentMapper.toResponse(updatedConsent)).thenReturn(expectedResponse);
+
+            // Act
+            var result = consentService.updateConsent(id, dto);
+
+            // Assert
+            verify(consentRepository, times(1)).findById(id);
+            verify(consentRepository, times(1)).save(updatedConsent);
+            verify(consentMapper).toResponse(updatedConsent);
+        }
+
+        @Test
+        void shouldUpdateConsentSuccessfully() {
+            // Arrange
+            var id = UUID.randomUUID().toString();
+            var existingConsent = ConsentFactory.buildConsent(ConsentFactory.buildCreateConsent());
+            existingConsent.setId(id);
+
+            var dto = new UpdateConsent(
+                    ConsentStatus.REVOKED,
+                    LocalDateTime.parse("2025-12-01T00:00:00"),
+                    "Atualização de consentimento"
+            );
+
+            var updatedConsent = Consent.builder()
+                    .id(id)
+                    .cpf(existingConsent.getCpf())
+                    .status(dto.status())
+                    .expirationDateTime(dto.expirationDateTime())
+                    .additionalInfo(dto.additionalInfo())
+                    .creationDateTime(existingConsent.getCreationDateTime())
+                    .build();
+
+            var expectedResponse = ConsentFactory.buildConsentResponse();
+
+            when(consentRepository.findById(id)).thenReturn(Optional.of(existingConsent));
+            when(consentRepository.save(any(Consent.class))).thenReturn(updatedConsent);
+            when(consentMapper.toResponse(updatedConsent)).thenReturn(expectedResponse);
+
+            // Act
+            var result = consentService.updateConsent(id, dto);
+
+            // Assert
+            verify(consentRepository).findById(id);
+            verify(consentRepository).save(existingConsent);
+            verifyNoMoreInteractions(consentRepository);
+
+            assertNotNull(result);
+            assertEquals(expectedResponse, result);
+            assertEquals(expectedResponse.cpf(), result.cpf());
+            assertEquals(expectedResponse.status(), result.status());
+            assertEquals(expectedResponse.creationDateTime(), result.creationDateTime());
+            assertEquals(expectedResponse.expirationDateTime(), result.expirationDateTime());
+            assertEquals(expectedResponse.additionalInfo(), result.additionalInfo());
+        }
+
+        @Test
+        void shouldThrowExceptionWhenUpdatingNonExistingConsent() {
+            // Arrange
+            var id = UUID.randomUUID().toString();
+            var dto = new UpdateConsent(ConsentStatus.REVOKED, LocalDateTime.now(), "Motivo");
+
+            when(consentRepository.findById(id)).thenReturn(Optional.empty());
+
+            // Act
+            var exception = assertThrows(ConsentNotFoundException.class, () -> {
+                consentService.updateConsent(id, dto);
+            });
+
+            // Assert
+            assertEquals("Consentimento não encontrado", exception.getMessage());
+            verify(consentRepository).findById(id);
+            verifyNoMoreInteractions(consentRepository);
+            verifyNoInteractions(consentMapper);
+        }
+
     }
 }
