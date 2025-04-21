@@ -29,7 +29,6 @@ public class ConsentResourceIT {
 
     @Test
     void shouldCreateConsentSuccessfully() {
-        // Arrange
         String requestBody = """
         {
           "cpf": "899.732.810-71",
@@ -50,5 +49,41 @@ public class ConsentResourceIT {
                 .body("status", Matchers.equalTo("ACTIVE"))
                 .body("expirationDateTime", Matchers.equalTo("2025-12-31T23:59:59"))
                 .body("additionalInfo", Matchers.equalTo("Consentimento para uso de dados pessoais"));
+    }
+
+
+    @Test
+    void shouldReturnAllConsentsSuccessfully() {
+        createTestConsent("111.111.111-11", "ACTIVE");
+        createTestConsent("222.222.222-22", "INACTIVE");
+
+        RestAssured.given()
+                .contentType(ContentType.JSON)
+                .when()
+                .get("/consents")
+                .then()
+                .statusCode(200)
+                .body("$", Matchers.hasSize(Matchers.greaterThanOrEqualTo(2)))
+                .body("[0].id", Matchers.notNullValue())
+                .body("[0].cpf", Matchers.notNullValue())
+                .body("[0].status", Matchers.isOneOf("ACTIVE", "INACTIVE", "REVOKED"))
+                .body("[0].creationDateTime", Matchers.notNullValue())
+                .body("[0].expirationDateTime", Matchers.notNullValue())
+                .body("[0].additionalInfo", Matchers.any(String.class));
+    }
+
+    private void createTestConsent(String cpf, String status) {
+        String json = String.format("""
+                            {
+                              "cpf": "%s",
+                              "status": "%s",
+                              "expirationDateTime": "2025-12-31T23:59:59"
+                            }
+                        """, cpf, status);
+
+        RestAssured.given()
+                .contentType(ContentType.JSON)
+                .body(json)
+                .post("/consents");
     }
 }
