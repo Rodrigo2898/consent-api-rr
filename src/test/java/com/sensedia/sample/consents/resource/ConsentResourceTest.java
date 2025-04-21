@@ -21,8 +21,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ConsentResourceTest {
@@ -35,7 +34,7 @@ class ConsentResourceTest {
 
     @Captor
     ArgumentCaptor<CreateConsent> createConsentArgumentCaptor;
-    
+
     @Captor
     ArgumentCaptor<String> consentIdArgumentCaptor;
 
@@ -234,6 +233,37 @@ class ConsentResourceTest {
             assertEquals(expected.creationDateTime(), body.creationDateTime());
             assertEquals(expected.expirationDateTime(), body.expirationDateTime());
             assertEquals(expected.additionalInfo(), body.additionalInfo());
+        }
+    }
+
+    @Nested
+    class DeleteConsentResource {
+
+        @Test
+        void shouldReturnHttpNoContent() {
+            // Arrange
+            var id = UUID.randomUUID().toString();
+            doNothing().when(consentService).deleteConsent(id);
+
+            // Act
+            var result = consentResource.delete(id);
+
+            // Assert
+            assertEquals(HttpStatusCode.valueOf(204), result.getStatusCode());
+        }
+
+        @Test
+        void shouldPassCorrectParametersToConsentService() {
+            // Arrange
+            var id = UUID.randomUUID().toString();
+            doNothing().when(consentService).deleteConsent(id);
+
+            // Act
+            var response = consentResource.delete(id);
+
+            // Assert
+            verify(consentService).deleteConsent(consentIdArgumentCaptor.capture());
+            assertEquals(id, consentIdArgumentCaptor.getValue());
         }
     }
 }
