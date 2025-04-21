@@ -14,6 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatusCode;
 
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
@@ -30,6 +31,9 @@ class ConsentResourceTest {
 
     @Captor
     ArgumentCaptor<CreateConsent> createConsentArgumentCaptor;
+
+    @Captor
+    ArgumentCaptor<String> consentIdArgumentCaptor;
 
     @Nested
     class CreateConsentResource {
@@ -111,4 +115,60 @@ class ConsentResourceTest {
             assertEquals(out, response.getBody());
         }
     }
+
+    @Nested
+    class FindByConsentIdResource {
+
+        @Test
+        void shouldReturnHttpOk() {
+            // Arrange
+            var id = UUID.randomUUID().toString();
+            var out = ConsentFactory.buildConsentResponse();
+            when(consentService.getConsentById(id)).thenReturn(out);
+
+            // Act
+            var response = consentResource.findByConsentId(id);
+
+            // Assert
+            assertEquals(HttpStatusCode.valueOf(200), response.getStatusCode());
+        }
+
+        @Test
+        void shouldPassCorrectParametersToConsentService() {
+            // Arrange
+            var id = UUID.randomUUID().toString();
+            var out = ConsentFactory.buildConsentResponse();
+            when(consentService.getConsentById(id)).thenReturn(out);
+
+            // Act
+            var response = consentResource.findByConsentId(id);
+
+            // Assert
+            verify(consentService).getConsentById(consentIdArgumentCaptor.capture());
+            assertEquals(id, consentIdArgumentCaptor.getValue());
+        }
+
+        @Test
+        void shouldReturnFindByIdResponseBodyCorrectly() {
+            // Arrange
+            var id = UUID.randomUUID().toString();
+            var out = ConsentFactory.buildConsentResponse();
+            when(consentService.getConsentById(id)).thenReturn(out);
+
+            // Act
+            var response = consentResource.findByConsentId(id);
+
+            // Assert
+            assertNotNull(response);
+            assertNotNull(response.getBody());
+
+            assertEquals(out.id(), response.getBody().id());
+            assertEquals(out.cpf(), response.getBody().cpf());
+            assertEquals(out.status(), response.getBody().status());
+            assertEquals(out.creationDateTime(), response.getBody().creationDateTime());
+            assertEquals(out.expirationDateTime(), response.getBody().expirationDateTime());
+            assertEquals(out.additionalInfo(), response.getBody().additionalInfo());
+        }
+    }
+
 }
