@@ -23,7 +23,7 @@ public class ConsentFactory {
                 "123.456.789-00",
                 ConsentStatus.ACTIVE,
                 LocalDateTime.now().minusDays(1),
-                LocalDateTime.now().plusDays(30),
+                LocalDateTime.parse("2025-12-31T23:59:59"),
                 "Consentimento para uso de dados pessoais"
         );
     }

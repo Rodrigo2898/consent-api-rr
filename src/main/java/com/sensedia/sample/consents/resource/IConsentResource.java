@@ -13,7 +13,7 @@ import java.util.List;
 public interface IConsentResource {
 
 	@PostMapping
-	ResponseEntity<CreateConsent> create(@Valid @RequestBody CreateConsent createConsent);
+	ResponseEntity<ConsentResponse> create(@Valid @RequestBody CreateConsent createConsent);
 
 	@GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<List<ConsentResponse>> findAll();

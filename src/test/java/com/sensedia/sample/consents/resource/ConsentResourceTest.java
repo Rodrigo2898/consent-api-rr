@@ -70,6 +70,9 @@ class ConsentResourceTest {
         void shouldReturnCreateResponseBodyCorrectly() {
             // Arrange
             var in = ConsentFactory.buildCreateConsent();
+            var out = ConsentFactory.buildConsentResponse();
+
+            when(consentService.saveConsent(any())).thenReturn(out);
 
             // Act
             var response = consentResource.create(in);

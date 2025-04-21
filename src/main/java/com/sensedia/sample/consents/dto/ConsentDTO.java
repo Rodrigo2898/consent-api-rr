@@ -5,7 +5,7 @@ import com.sensedia.sample.consents.domain.enums.ConsentStatus;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-public record ConsentDTO(UUID id,
+public record ConsentDTO(String id,
                          String cpf,
                          ConsentStatus status,
                          LocalDateTime creationDateTime,

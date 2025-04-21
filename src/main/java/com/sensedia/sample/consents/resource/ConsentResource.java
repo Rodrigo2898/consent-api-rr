@@ -1,5 +1,6 @@
 package com.sensedia.sample.consents.resource;
 
+import com.sensedia.sample.consents.dto.ConsentDTO;
 import com.sensedia.sample.consents.dto.request.CreateConsent;
 import com.sensedia.sample.consents.dto.request.UpdateConsent;
 import com.sensedia.sample.consents.dto.response.ConsentResponse;
@@ -25,10 +26,10 @@ public class ConsentResource implements IConsentResource {
 	}
 
     @Override
-	public ResponseEntity<CreateConsent> create(CreateConsent createConsent) {
+	public ResponseEntity<ConsentResponse> create(CreateConsent createConsent) {
 		log.info("Criando novo consentimento");
-		consentService.saveConsent(createConsent);
-		return ResponseEntity.status(HttpStatus.CREATED).body(createConsent);
+		ConsentResponse response = consentService.saveConsent(createConsent);
+		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
 
 	@Override

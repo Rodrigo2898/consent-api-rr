@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface IConsentService {
 
-    void saveConsent(CreateConsent dto);
+    ConsentResponse saveConsent(CreateConsent dto);
 
     List<ConsentResponse> getAll();
 

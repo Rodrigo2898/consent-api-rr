@@ -25,10 +25,10 @@ public class ConsentServiceImpl implements IConsentService {
     }
 
     @Override
-    public void saveConsent(CreateConsent dto) {
+    public ConsentResponse saveConsent(CreateConsent dto) {
         Consent consent = consentMapper.toDocument(dto);
         consent.setCreationDateTime(LocalDateTime.now());
-        consentRepository.save(consent);
+        return consentMapper.toResponse(consentRepository.save(consent));
     }
 
     @Override
