@@ -304,6 +304,62 @@ class ConsentServiceImplTest {
             verifyNoMoreInteractions(consentRepository);
             verifyNoInteractions(consentMapper);
         }
+    }
+
+    @Nested
+    class DeleteConsent {
+
+        @Test
+        void shouldCallRepositoryDeleteConsent() {
+            // Arrange
+            var id = UUID.randomUUID().toString();
+            var consent = ConsentFactory.buildConsent(ConsentFactory.buildCreateConsent());
+            consent.setId(id);
+
+            when(consentRepository.findById(id)).thenReturn(Optional.of(consent));
+
+            // Act
+            consentService.deleteConsent(id);
+
+            // Assert
+            verify(consentRepository, times(1)).findById(id);
+            verify(consentRepository, times(1)).delete(consent);
+        }
+
+        @Test
+        void shouldDeleteConsentSuccessfully() {
+            // Arrange
+            var id = UUID.randomUUID().toString();
+            var consent = ConsentFactory.buildConsent(ConsentFactory.buildCreateConsent());
+            consent.setId(id);
+
+            when(consentRepository.findById(id)).thenReturn(Optional.of(consent));
+
+            // Act
+            consentService.deleteConsent(id);
+
+            // Assert
+            verify(consentRepository).findById(id);
+            verify(consentRepository).delete(consent);
+        }
+
+        @Test
+        void shouldThrowExceptionWhenDeletingNonExistingConsent() {
+            // Arrange
+            var id = UUID.randomUUID().toString();
+
+            when(consentRepository.findById(id)).thenReturn(Optional.empty());
+
+            // Act
+            var exception = assertThrows(ConsentNotFoundException.class, () -> {
+                consentService.deleteConsent(id);
+            });
+
+            // Assert
+            assertEquals("Consentimento não encontrado", exception.getMessage());
+            verify(consentRepository).findById(id);
+            verify(consentRepository, never()).delete(any());
+        }
 
     }
 }
