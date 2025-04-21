@@ -13,8 +13,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatusCode;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ConsentResourceTest {
@@ -72,6 +75,40 @@ class ConsentResourceTest {
             assertEquals(in.status(), response.getBody().status());
             assertEquals(in.additionalInfo(), response.getBody().additionalInfo());
             assertEquals(in.expirationDateTime(), response.getBody().expirationDateTime());
+        }
+    }
+
+    @Nested
+    class FindALlConsentsResource {
+
+        @Test
+        void shouldReturnHttpOk() {
+            // Arrange
+            var out = List.of(ConsentFactory.buildConsentResponse());
+            when(consentService.getAll()).thenReturn(out);
+
+            // Act
+            var response = consentResource.findAll();
+
+            // Assert
+            assertEquals(HttpStatusCode.valueOf(200), response.getStatusCode());
+        }
+
+        @Test
+        void shouldReturnListOfConsentsCorrectly() {
+            // Arrange
+            var out = List.of(ConsentFactory.buildConsentResponse());
+            when(consentService.getAll()).thenReturn(out);
+
+            // Act
+            var response = consentResource.findAll();
+
+            // Assert
+            assertNotNull(response);
+            assertNotNull(response.getBody());
+
+            assertEquals(out.size(), response.getBody().size());
+            assertEquals(out, response.getBody());
         }
     }
 }
