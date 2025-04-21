@@ -12,6 +12,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -45,7 +49,7 @@ class ConsentServiceImplTest {
         }
 
         @Test
-        void shouldCreateClienteSuccessfully() {
+        void shouldCreateConsentSuccessfully() {
             // Arrange
             var dto = ConsentFactory.buildCreateConsent();
             var consent = ConsentFactory.buildConsent(dto);
@@ -70,4 +74,55 @@ class ConsentServiceImplTest {
             assertNotNull(captorValue.getCreationDateTime());
         }
     }
+
+    @Nested
+    class GetAllConsents {
+
+        @Test
+        void shouldCallRepositoryGetAll() {
+            // Arrange
+            var consent = ConsentFactory.buildConsent(ConsentFactory.buildCreateConsent());
+            consent.setId(UUID.randomUUID().toString());
+            consent.setCreationDateTime(LocalDateTime.now().minusDays(1));
+
+            var consentList = List.of(consent);
+            var responseList = List.of(ConsentFactory.buildConsentResponse());
+
+            when(consentRepository.findAll()).thenReturn(consentList);
+            when(consentMapper.toResponseList(consentList)).thenReturn(responseList);
+
+            // Act
+            var result = consentService.getAll();
+
+            // Assert
+            verify(consentRepository, times(1)).findAll();
+            verify(consentMapper).toResponseList(consentList);
+        }
+
+        @Test
+        void shouldListConsentsSuccessfully() {
+            // Arrange
+            var consent = ConsentFactory.buildConsent(ConsentFactory.buildCreateConsent());
+            consent.setId(UUID.randomUUID().toString());
+            consent.setCreationDateTime(LocalDateTime.now().minusDays(1));
+
+            var consentList = List.of(consent);
+            var responseList = List.of(ConsentFactory.buildConsentResponse());
+
+            when(consentRepository.findAll()).thenReturn(consentList);
+            when(consentMapper.toResponseList(consentList)).thenReturn(responseList);
+
+            // Act
+            var result = consentService.getAll();
+
+            // Assert
+            verify(consentRepository).findAll();
+            verifyNoMoreInteractions(consentRepository);
+
+            assertNotNull(result);
+            assertEquals(responseList.size(), result.size());
+            assertEquals(responseList, result);
+        }
+    }
+    
 }
