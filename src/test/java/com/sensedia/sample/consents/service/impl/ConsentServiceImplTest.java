@@ -4,6 +4,7 @@ import com.sensedia.sample.consents.domain.document.Consent;
 import com.sensedia.sample.consents.factory.ConsentFactory;
 import com.sensedia.sample.consents.mapper.ConsentMapper;
 import com.sensedia.sample.consents.repository.ConsentRepository;
+import com.sensedia.sample.consents.service.exceptions.ConsentNotFoundException;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -100,7 +102,7 @@ class ConsentServiceImplTest {
         }
 
         @Test
-        void shouldListConsentsSuccessfully() {
+        void shouldReturnAllConsentsSuccessfully() {
             // Arrange
             var consent = ConsentFactory.buildConsent(ConsentFactory.buildCreateConsent());
             consent.setId(UUID.randomUUID().toString());
@@ -124,5 +126,75 @@ class ConsentServiceImplTest {
             assertEquals(responseList, result);
         }
     }
-    
+
+    @Nested
+    class GetConsentById {
+
+        @Test
+        void shouldCallRepositoryGetConsentById() {
+            // Arrange
+            var id = UUID.randomUUID().toString();
+            var consent = ConsentFactory.buildConsent(ConsentFactory.buildCreateConsent());
+            consent.setId(id);
+            consent.setCreationDateTime(LocalDateTime.now());
+
+            var response = ConsentFactory.buildConsentResponse();
+
+            when(consentRepository.findById(id)).thenReturn(Optional.of(consent));
+            when(consentMapper.toResponse(consent)).thenReturn(response);
+
+            // Act
+            var result = consentService.getConsentById(id);
+
+            // Assert
+            verify(consentRepository, times(1)).findById(id);
+            verify(consentMapper).toResponse(consent);
+        }
+
+        @Test
+        void shouldReturnConsentByIdSuccessfully() {
+            // Arrange
+            var id = UUID.randomUUID().toString();
+            var consent = ConsentFactory.buildConsent(ConsentFactory.buildCreateConsent());
+            consent.setId(id);
+            consent.setCreationDateTime(LocalDateTime.now());
+
+            var response = ConsentFactory.buildConsentResponse();
+
+            when(consentRepository.findById(id)).thenReturn(Optional.of(consent));
+            when(consentMapper.toResponse(consent)).thenReturn(response);
+
+            // Act
+            var result = consentService.getConsentById(id);
+
+            // Assert
+            verify(consentRepository).findById(id);
+            verifyNoMoreInteractions(consentRepository);
+
+            assertNotNull(result);
+            assertEquals(response, result);
+            assertEquals(response.cpf(), result.cpf());
+            assertEquals(response.status(), result.status());
+            assertEquals(response.creationDateTime(), result.creationDateTime());
+            assertEquals(response.expirationDateTime(), result.expirationDateTime());
+            assertEquals(response.additionalInfo(), result.additionalInfo());
+        }
+
+        @Test
+        void shouldThrowExceptionWhenConsentNotFound() {
+            // Arrange
+            String id = UUID.randomUUID().toString();
+            when(consentRepository.findById(id)).thenReturn(Optional.empty());
+
+            // Act
+            var exception = assertThrows(ConsentNotFoundException.class, () -> {
+                consentService.getConsentById(id);
+            });
+
+            // Assert
+            assertEquals("Consentimento não encontrado", exception.getMessage());
+            verify(consentRepository).findById(id);
+            verifyNoMoreInteractions(consentMapper);
+        }
+    }
 }
