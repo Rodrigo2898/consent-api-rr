@@ -44,14 +44,14 @@ public class ConsentServiceImpl implements IConsentService {
     @Override
     public ConsentResponse getConsentById(String id) {
         Consent consent = consentRepository.findById(id)
-                .orElseThrow(() -> new ConsentNotFoundException("Consentimento com ID " + id + " não encontrado"));
+                .orElseThrow(() -> new ConsentNotFoundException("Consentimento não encontrado"));
         return consentMapper.toResponse(consent);
     }
 
     @Override
     public ConsentResponse updateConsent(String id, UpdateConsent dto) {
         Consent consent = consentRepository.findById(id)
-                .orElseThrow(() -> new ConsentNotFoundException("Consentimento com ID " + id + " não encontrado"));
+                .orElseThrow(() -> new ConsentNotFoundException("Consentimento não encontrado"));
 
         if (dto == null || dto.status() == null || dto.expirationDateTime() == null) {
             throw new InvalidConsentDataException("Status e data de expiração são obrigatórios para atualizar o consentimento.");
@@ -67,7 +67,7 @@ public class ConsentServiceImpl implements IConsentService {
     @Override
     public void deleteConsent(String id) {
         Consent consent = consentRepository.findById(id)
-                .orElseThrow(() -> new ConsentNotFoundException("Consentimento com ID " + id + " não encontrado"));
+                .orElseThrow(() -> new ConsentNotFoundException("Consentimento não encontrado"));
         consentRepository.delete(consent);
     }
 }
