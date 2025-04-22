@@ -1,7 +1,7 @@
 version: '3.9'
 
 services:
-  mongo:
+  mongo_consent:
     image: mongo:latest
     container_name: mongo_consent
     environment:
@@ -12,6 +12,29 @@ services:
       - "27017:27017"
     volumes:
       - mongo_data:/data/db
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongo -u consent -p consent --quiet || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+  consents:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    ports:
+      - "8099:8099"
+    healthcheck:
+      test: "curl --fail --silent localhost:8099/actuator/health/readiness | grep UP || exit 1"
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    depends_on:
+     - mongo_consent
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://consent:consent@mongo_consent:27017/consentdb?authSource=admin
 
 volumes:
   mongo_data:
