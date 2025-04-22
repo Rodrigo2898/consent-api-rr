@@ -7,3 +7,10 @@ spring:
     mongodb:
       uri: mongodb://consent:consent@localhost:27017/consentdb?authSource=admin
 
+
+
+external:
+  github:
+    api:
+      url: https://api.github.com
+

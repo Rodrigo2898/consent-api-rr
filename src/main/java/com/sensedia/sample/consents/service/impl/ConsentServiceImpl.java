@@ -1,5 +1,6 @@
 package com.sensedia.sample.consents.service.impl;
 
+import com.sensedia.sample.consents.config.GitHubApiClient;
 import com.sensedia.sample.consents.domain.document.Consent;
 import com.sensedia.sample.consents.dto.request.CreateConsent;
 import com.sensedia.sample.consents.dto.request.UpdateConsent;
@@ -11,6 +12,7 @@ import com.sensedia.sample.consents.repository.ConsentRepository;
 import com.sensedia.sample.consents.exceptions.InvalidConsentDataException;
 import com.sensedia.sample.consents.service.IConsentService;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -21,11 +23,13 @@ public class ConsentServiceImpl implements IConsentService {
     private final ConsentRepository consentRepository;
     private final ConsentAuditServiceImpl auditService;
     private final ConsentMapper consentMapper;
+    private final GitHubApiClient gitHubApiClient;
 
-    public ConsentServiceImpl(ConsentRepository consentRepository, ConsentAuditServiceImpl auditService, ConsentMapper consentMapper) {
+    public ConsentServiceImpl(ConsentRepository consentRepository, ConsentAuditServiceImpl auditService, ConsentMapper consentMapper, GitHubApiClient gitHubApiClient) {
         this.consentRepository = consentRepository;
         this.auditService = auditService;
         this.consentMapper = consentMapper;
+        this.gitHubApiClient = gitHubApiClient;
     }
 
     @Override
@@ -37,6 +41,19 @@ public class ConsentServiceImpl implements IConsentService {
         Consent consent = consentMapper.toDocument(dto);
         consent.setCreationDateTime(LocalDateTime.now());
         return consentMapper.toResponse(consentRepository.save(consent));
+    }
+
+    @Override
+    public Mono<ConsentResponse> createConsentWithAdditionalInfo(CreateConsent createConsent) {
+        return gitHubApiClient.getUserLogin("martinfowler")
+                .flatMap(login -> {
+                    // Cria o consentimento com a bio do GitHub
+                    Consent consent = consentMapper.toDocument(createConsent);
+                    consent.setAdditionalInfo(login);
+                    consent.setCreationDateTime(LocalDateTime.now());
+                    return Mono.just(consentRepository.save(consent))
+                            .map(consentMapper::toResponse);
+                });
     }
 
     @Override
@@ -54,7 +71,7 @@ public class ConsentServiceImpl implements IConsentService {
     @Override
     public ConsentResponse updateConsent(String id, UpdateConsent dto) {
         Consent existingConsent = consentRepository.findById(id)
-                .orElseThrow(() -> new ConsentNotFoundException(id));
+                .orElseThrow(() -> new ConsentNotFoundException("Consentimento não encontrado"));
 
         // Salva estado anterior para auditoria
         Consent previousState = new Consent(existingConsent);

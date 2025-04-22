@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -94,5 +95,21 @@ public class GlobalExceptionHandler {
         );
 
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+
+    /**
+     * Trata erros para chamada externa
+     * */
+    @ExceptionHandler(WebClientResponseException.class)
+    public ResponseEntity<ErrorResponse> handleWebClientException(WebClientResponseException ex) {
+        ErrorResponse response = new ErrorResponse(
+                LocalDateTime.now(),
+                ex.getStatusCode().value(),
+                "Erro na chamada externa",
+                ex.getResponseBodyAsString(),
+                "Falha ao consultar API externa"
+        );
+        return ResponseEntity.status(ex.getStatusCode()).body(response);
     }
 }

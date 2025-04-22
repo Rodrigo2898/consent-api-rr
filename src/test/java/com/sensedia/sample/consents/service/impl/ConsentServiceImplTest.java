@@ -32,6 +32,9 @@ class ConsentServiceImplTest {
     @Mock
     private ConsentMapper consentMapper;
 
+    @Mock
+    ConsentAuditServiceImpl auditService;
+
     @InjectMocks
     private ConsentServiceImpl consentService;
 

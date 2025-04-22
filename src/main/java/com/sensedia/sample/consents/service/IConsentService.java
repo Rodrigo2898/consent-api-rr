@@ -4,6 +4,7 @@ import com.sensedia.sample.consents.dto.request.CreateConsent;
 import com.sensedia.sample.consents.dto.request.UpdateConsent;
 import com.sensedia.sample.consents.dto.response.ConsentAuditResponse;
 import com.sensedia.sample.consents.dto.response.ConsentResponse;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -20,4 +21,6 @@ public interface IConsentService {
     void deleteConsent(String id);
 
     List<ConsentAuditResponse> getConsentHistory(String consentId);
+
+    Mono<ConsentResponse> createConsentWithAdditionalInfo(CreateConsent createConsent);
 }
