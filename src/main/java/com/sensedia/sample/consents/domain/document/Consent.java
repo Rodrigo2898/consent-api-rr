@@ -30,4 +30,7 @@ public class Consent {
     private LocalDateTime expirationDateTime;
     @Size(min = 1, max = 50)
     private String additionalInfo;
+
+    public Consent(Consent existingConsent) {
+    }
 }

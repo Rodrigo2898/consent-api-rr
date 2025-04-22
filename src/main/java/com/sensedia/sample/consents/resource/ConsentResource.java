@@ -2,6 +2,7 @@ package com.sensedia.sample.consents.resource;
 
 import com.sensedia.sample.consents.dto.request.CreateConsent;
 import com.sensedia.sample.consents.dto.request.UpdateConsent;
+import com.sensedia.sample.consents.dto.response.ConsentAuditResponse;
 import com.sensedia.sample.consents.dto.response.ConsentResponse;
 import com.sensedia.sample.consents.dto.response.ErrorResponse;
 import com.sensedia.sample.consents.service.IConsentService;
@@ -215,5 +216,29 @@ public class ConsentResource implements IConsentResource {
 		log.info("Deletando consentimento: {}", id);
 		consentService.deleteConsent(id);
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+	}
+
+
+	@Operation(
+			summary = "Consultar Histórico de Alterações",
+			description = "Endpoint para recuperar o histórico de alterações de um consentimento"
+	)
+	@ApiResponses({
+			@ApiResponse(
+					responseCode = "200",
+					description = "Histórico retornado com sucesso",
+					content = @Content(
+							schema = @Schema(implementation = ConsentAuditResponse[].class)
+					)
+			),
+			@ApiResponse(
+					responseCode = "404",
+					description = "Consentimento não encontrado"
+			)
+	})
+	@Override
+	public ResponseEntity<List<ConsentAuditResponse>> getConsentHistory(String id) {
+		log.info("Consultando histórico do consentimento: {}", id);
+		return ResponseEntity.ok(consentService.getConsentHistory(id));
 	}
 }
